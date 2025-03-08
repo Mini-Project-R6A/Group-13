@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "429731417039",
+    "project_id": "nyaymitra-f643d",
+    "storage_bucket": "nyaymitra-f643d.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:429731417039:android:43d3742ea36c879aeba0ba",
+        "android_client_info": {
+          "package_name": "com.example.nyaymitra1"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAKXpe62gBKaqThqx7UUr-stqnuR2jjmUQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

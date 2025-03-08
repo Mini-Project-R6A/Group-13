@@ -35,13 +35,12 @@ class _TextInputScreenState extends State<TextInputScreen> {
                 {
                   "text":
                       "You are a legal expert assistant. Analyze the following legal complaint and provide a structured response with:\n\n"
-                      "- Identify if the victim is male or female (based on the text). no need to display this info\n"
                       "- Classification of the case.\n"
-                      "- Relevant IPC Sections with new Bharatiya Nyaya Samhita (BNS) sections, if applicable, in bullet points.\n"
-                      "- If the complaint involves harm against a female, include additional IPC/BNS sections related to crimes against women.\n"
+                      "- Relevant IPC Sections with BNS sections (with the most latest updated BNS sections and verify it carefully before adding in the output) in bullet points.\n"
+                      "- If the complaint involves harm against a female, include additional IPC/BNS sections.\n"
                       "- Landmark Judgments.\n"
                       "- Simplified Explanation.\n\n"
-                      "Format your response in clear, concise paragraphs without numbering or markdown.\n\n"
+                      "Format your response with clear headings, bullet points, and structured paragraphs. Do not use markdown symbols like ** or ##.\n\n"
                       "Complaint:\n${_controller.text}",
                 },
               ],
@@ -60,14 +59,11 @@ class _TextInputScreenState extends State<TextInputScreen> {
           _response = content;
         });
       } else {
-        print('API Error: ${response.statusCode}');
-        print('Response Body: ${response.body}');
         setState(() {
           _response = 'Error processing your complaint. Please try again.';
         });
       }
     } catch (e) {
-      print('Exception: $e');
       setState(() {
         _response = 'Connection error. Please check your internet.';
       });
@@ -86,6 +82,7 @@ class _TextInputScreenState extends State<TextInputScreen> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
+            // Input Field
             TextField(
               controller: _controller,
               maxLines: 5,
@@ -96,6 +93,8 @@ class _TextInputScreenState extends State<TextInputScreen> {
               ),
             ),
             const SizedBox(height: 20),
+
+            // Submit Button or Loading Indicator
             _isLoading
                 ? const CircularProgressIndicator()
                 : ElevatedButton(
@@ -103,21 +102,34 @@ class _TextInputScreenState extends State<TextInputScreen> {
                   child: const Text('Submit Complaint'),
                 ),
             const SizedBox(height: 20),
+
+            // Styled Response Display
             Expanded(
               child: SingleChildScrollView(
                 child: Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: Colors.grey[200],
+                    color: Colors.white,
                     borderRadius: BorderRadius.circular(8),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.withOpacity(0.2),
+                        spreadRadius: 2,
+                        blurRadius: 5,
+                        offset: const Offset(0, 3),
+                      ),
+                    ],
                   ),
-                  child: Text(
-                    _response.replaceAll(
-                      '**',
-                      '',
-                    ), // Remove bold markers if any
-                    style: const TextStyle(fontSize: 16, height: 1.5),
-                  ),
+                  child:
+                      _response.isEmpty
+                          ? const Text(
+                            "Your response will be displayed here.",
+                            style: TextStyle(fontSize: 16, color: Colors.grey),
+                          )
+                          : Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: _formatResponse(_response),
+                          ),
                 ),
               ),
             ),
@@ -125,6 +137,63 @@ class _TextInputScreenState extends State<TextInputScreen> {
         ),
       ),
     );
+  }
+
+  List<Widget> _formatResponse(String response) {
+    List<String> lines = response.split("\n");
+    List<Widget> formattedText = [];
+
+    for (String line in lines) {
+      if (line.trim().isEmpty) continue;
+
+      if (line.contains(":")) {
+        // Bold the headings
+        List<String> parts = line.split(":");
+        formattedText.add(
+          RichText(
+            text: TextSpan(
+              style: const TextStyle(
+                fontSize: 16,
+                color: Colors.black,
+                height: 1.5,
+              ),
+              children: [
+                TextSpan(
+                  text: "${parts[0]}:",
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
+                TextSpan(text: " ${parts.sublist(1).join(":")}"),
+              ],
+            ),
+          ),
+        );
+      } else if (line.startsWith("-")) {
+        // Bullet points
+        formattedText.add(
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text("• ", style: TextStyle(fontSize: 16)),
+              Expanded(
+                child: Text(
+                  line.substring(1).trim(),
+                  style: const TextStyle(fontSize: 16, height: 1.5),
+                ),
+              ),
+            ],
+          ),
+        );
+      } else {
+        // Normal text
+        formattedText.add(
+          Text(line, style: const TextStyle(fontSize: 16, height: 1.5)),
+        );
+      }
+
+      formattedText.add(const SizedBox(height: 5)); // Spacing
+    }
+
+    return formattedText;
   }
 
   @override
