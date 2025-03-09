@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:flutter_markdown/flutter_markdown.dart'; // Add this import
 
 // Main screen widget that handles the legal query functionality
 class TextInputScreen extends StatefulWidget {
@@ -108,16 +109,21 @@ class _TextInputScreenState extends State<TextInputScreen> {
   @override
   Widget build(BuildContext context) {
     // Define theme colors - brown shade
-    final primaryColor = Colors.brown[600];
+    final primaryColor = const Color(0xFF8B5A2B);
     final backgroundColor = Colors.brown[50];
 
     return Scaffold(
       // App bar with theme color
       appBar: AppBar(
         title: const Text("Legal Query"),
+        titleTextStyle: const TextStyle(
+          fontWeight: FontWeight.bold,
+          fontSize: 25,
+        ),
         backgroundColor: primaryColor,
         foregroundColor: Colors.white,
         elevation: 0, // Modern flat design
+        centerTitle: true,
       ),
       // Background color for the entire screen
       backgroundColor: backgroundColor,
@@ -136,7 +142,7 @@ class _TextInputScreenState extends State<TextInputScreen> {
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: primaryColor!, width: 2),
+                  borderSide: BorderSide(color: primaryColor, width: 2),
                 ),
                 labelText: 'Enter your legal complaint',
                 labelStyle: TextStyle(color: Colors.brown[400]),
@@ -171,7 +177,7 @@ class _TextInputScreenState extends State<TextInputScreen> {
                 ),
             const SizedBox(height: 20),
 
-            // Response Display with card design
+            // Response Display with card design and Markdown support
             Expanded(
               child: Container(
                 decoration: BoxDecoration(
@@ -188,24 +194,49 @@ class _TextInputScreenState extends State<TextInputScreen> {
                 ),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(12),
-                  child: SingleChildScrollView(
-                    padding: const EdgeInsets.all(16),
-                    child:
-                        _response.isEmpty
-                            ? Center(
-                              child: Text(
-                                "Your legal analysis will appear here",
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  color: Colors.brown[300],
-                                ),
+                  child:
+                      _response.isEmpty
+                          ? Center(
+                            child: Text(
+                              "Your legal analysis will appear here",
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.brown[300],
                               ),
-                            )
-                            : Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: _formatResponse(_response),
                             ),
-                  ),
+                          )
+                          : Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: Markdown(
+                              data: _response,
+                              styleSheet: MarkdownStyleSheet(
+                                h1: TextStyle(
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.brown[800],
+                                ),
+                                h2: TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.brown[700],
+                                ),
+                                h3: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.brown[600],
+                                ),
+                                p: TextStyle(
+                                  fontSize: 16,
+                                  color: Colors.brown[800],
+                                  height: 1.5,
+                                ),
+                                strong: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                listBullet: TextStyle(color: Colors.brown[600]),
+                              ),
+                            ),
+                          ),
                 ),
               ),
             ),
@@ -213,78 +244,6 @@ class _TextInputScreenState extends State<TextInputScreen> {
         ),
       ),
     );
-  }
-
-  // Helper method to format the response text
-  List<Widget> _formatResponse(String response) {
-    final List<String> lines = response.split("\n");
-    final List<Widget> formattedText = [];
-    final TextStyle normalStyle = TextStyle(
-      fontSize: 16,
-      color: Colors.brown[800],
-      height: 1.5,
-    );
-
-    for (String line in lines) {
-      if (line.trim().isEmpty) continue;
-
-      // Format headings (text followed by colon)
-      if (line.contains(":") && !line.startsWith("-")) {
-        List<String> parts = line.split(":");
-        formattedText.add(
-          Padding(
-            padding: const EdgeInsets.only(bottom: 8.0),
-            child: RichText(
-              text: TextSpan(
-                style: normalStyle,
-                children: [
-                  TextSpan(
-                    text: "${parts[0]}:",
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: Colors.brown[700],
-                      fontSize: 17,
-                    ),
-                  ),
-                  TextSpan(text: " ${parts.sublist(1).join(":")}"),
-                ],
-              ),
-            ),
-          ),
-        );
-      }
-      // Format bullet points
-      else if (line.startsWith("-")) {
-        formattedText.add(
-          Padding(
-            padding: const EdgeInsets.only(bottom: 6.0, left: 4.0),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  "• ",
-                  style: TextStyle(fontSize: 16, color: Colors.brown[600]),
-                ),
-                Expanded(
-                  child: Text(line.substring(1).trim(), style: normalStyle),
-                ),
-              ],
-            ),
-          ),
-        );
-      }
-      // Normal text
-      else {
-        formattedText.add(
-          Padding(
-            padding: const EdgeInsets.only(bottom: 8.0),
-            child: Text(line, style: normalStyle),
-          ),
-        );
-      }
-    }
-
-    return formattedText;
   }
 
   @override

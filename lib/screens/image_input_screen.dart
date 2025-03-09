@@ -3,7 +3,7 @@ import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'package:google_ml_kit/google_ml_kit.dart';
+import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 
@@ -41,7 +41,8 @@ class _ImageInputScreenState extends State<ImageInputScreen> {
       _response = "Extracting text...";
     });
 
-    final textRecognizer = GoogleMlKit.vision.textRecognizer();
+    // New way to use text recognition
+    final textRecognizer = TextRecognizer(script: TextRecognitionScript.latin);
     final inputImage = InputImage.fromFile(imageFile);
 
     try {
@@ -167,8 +168,15 @@ class _ImageInputScreenState extends State<ImageInputScreen> {
       backgroundColor: Colors.brown[50],
       appBar: AppBar(
         elevation: 0,
-        backgroundColor: Colors.brown[700],
-        title: const Text(""), // Removed the heading as requested
+        backgroundColor: Color(0xFF8B5A2B),
+        title: const Text(
+          "Image Legal Assistance",
+          style: TextStyle(
+            fontSize: 22,
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
+        ), // Removed the heading as requested
         centerTitle: true,
       ),
       body: SafeArea(

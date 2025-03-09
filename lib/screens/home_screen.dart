@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'package:url_launcher/url_launcher.dart'; // Import url_launcher package
+import 'package:url_launcher/url_launcher.dart';
 
 // Import other screens for navigation
 import 'text_input_screen.dart';
@@ -9,7 +9,6 @@ import 'voice_input_screen.dart';
 import 'image_input_screen.dart';
 import 'profile_screen.dart';
 
-// HomeScreen is the main screen of the app
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -17,7 +16,6 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-// State class for HomeScreen
 class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
   List<dynamic> _news = [];
@@ -32,10 +30,10 @@ class _HomeScreenState extends State<HomeScreen> {
     const ProfileScreen(),
   ];
 
-  // Brown color palette
-  final Color _primaryBrown = const Color(0xFF795548);
-  final Color _lightBrown = const Color(0xFFD7CCC8);
-  final Color _darkBrown = const Color(0xFF4E342E);
+  // Lighter brown color palette
+  final Color _primaryBrown = const Color(0xFF8B5A2B); // Lighter primary brown
+  final Color _lightBrown = const Color(0xFFE6DFD9); // Lighter background brown
+  final Color _darkBrown = const Color(0xFF7D5A41); // Lighter dark brown
 
   @override
   void initState() {
@@ -54,9 +52,8 @@ class _HomeScreenState extends State<HomeScreen> {
       if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
         throw Exception('Could not launch $url');
       }
-    } catch (e) {
-      print("Error launching URL: $e");
-    }
+      // ignore: empty_catches
+    } catch (e) {}
   }
 
   // Function to fetch legal news from API
@@ -75,7 +72,6 @@ class _HomeScreenState extends State<HomeScreen> {
         });
       }
     } catch (e) {
-      print("Error fetching news: $e");
       setState(() {
         _isLoading = false;
       });
@@ -125,8 +121,7 @@ class _HomeScreenState extends State<HomeScreen> {
     // Check if content contains truncation markers like "+1234 chars"
     if (contentText.contains(RegExp(r'\+\d+ chars'))) {
       // Remove the truncation marker and clean the text
-      return contentText.replaceAll(RegExp(r'\s*\+\d+ chars.*$'), '') +
-          '\n\n[Content truncated by news provider]';
+      return '${contentText.replaceAll(RegExp(r'\s*\+\d+ chars.*$'), '')}\n\n[Content truncated by news provider]';
     }
 
     return contentText;
@@ -137,7 +132,6 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       body:
           _currentIndex == 0 ? _buildHomeScreen() : _screens[_currentIndex - 1],
-
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
           boxShadow: [
@@ -192,18 +186,10 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
-        flexibleSpace: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [_primaryBrown, _darkBrown],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-          ),
-        ),
+        backgroundColor: _primaryBrown,
         title: const Text(
           "Latest Legal News",
-          style: TextStyle(fontWeight: FontWeight.bold),
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
         actions: [
           IconButton(
@@ -216,10 +202,9 @@ class _HomeScreenState extends State<HomeScreen> {
             },
           ),
         ],
+        centerTitle: true,
       ),
-
       backgroundColor: const Color(0xFFF5F5F5),
-
       body:
           _isLoading
               ? Center(child: CircularProgressIndicator(color: _primaryBrown))
@@ -385,10 +370,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                         // Full content
                                         Text(
                                           _cleanContentText(
-                                                _news[index]['content'],
-                                              ) ??
-                                              _news[index]['description'] ??
-                                              'No content available',
+                                            _news[index]['content'],
+                                          ),
                                           style: const TextStyle(
                                             fontSize: 14,
                                             height: 1.6,
